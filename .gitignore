@@ -1,0 +1,8 @@
+.terraform/
+terraform.exe
+env/
+*.pem
+.terraform.lock.hcl
+*.tfplan
+*.tfstate
+*.tfstate.backup
