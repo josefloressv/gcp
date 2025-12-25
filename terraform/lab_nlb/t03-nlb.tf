@@ -1,6 +1,6 @@
 # 1. External Static IP for the Load Balancer (The Frontend IP)
 resource "google_compute_address" "lb_static_ip" {
-  name   = "network-lb-static-ip"
+  name   = "network-lb-ip-1"
   region = var.region
 }
 

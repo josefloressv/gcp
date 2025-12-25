@@ -25,7 +25,8 @@ resource "google_compute_instance" "vm_1" {
     #!/bin/bash
     apt-get update
     apt-get install -y apache2
-    echo "Hi from Instance 1" > /var/www/html/index.html
+    echo "
+    <h3>Web Server: www1</h3>" | tee /var/www/html/index.html
   EOT
 }
 
@@ -52,7 +53,8 @@ resource "google_compute_instance" "vm_2" {
     #!/bin/bash
     apt-get update
     apt-get install -y apache2
-    echo "Hi from Instance 2" > /var/www/html/index.html
+    echo "
+    <h3>Web Server: www2</h3>" | tee /var/www/html/index.html
   EOT
 }
 
@@ -80,7 +82,22 @@ resource "google_compute_instance" "vm_3" {
     #!/bin/bash
     apt-get update
     apt-get install -y apache2
-    echo "Hi from Instance 2" > /var/www/html/index.html
+    echo "
+    <h3>Web Server: www3</h3>" | tee /var/www/html/index.html
   EOT
 }
 
+# Regla de Firewall para Health Checks y Tráfico Externo
+resource "google_compute_firewall" "allow_http" {
+  name    = "www-firewall-network-lb"
+  network = google_compute_network.vpc_network.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80"]
+  }
+
+  # ACE Tip: Estos rangos son fijos para los Health Checks de Google
+  source_ranges = ["0.0.0.0/0", "35.191.0.0/16", "209.85.152.0/22"]
+  target_tags   = ["network-lb-tag"]
+}

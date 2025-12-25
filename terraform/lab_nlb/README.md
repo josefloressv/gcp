@@ -7,12 +7,10 @@ https://www.skills.google/paths/77/course_templates/648/labs/613022
 gcloud auth application-default revoke
 gcloud auth application-default login
 gcloud config set account xxx@xxx.com
-gcloud config set project playground-s-11-e51aa399
+gcloud config set project playground-s-xxxx
 export GOOGLE_PROJECT=$(gcloud config get project)
-./deploy-infra.sh nlb_lab plan
-
-gcloud config set compute/region Region
-gcloud config set compute/zone Zone
+# Change the region according the LAB in variables.tf
+./deploy-infra.sh lab_nlb plan
 
 ```
 
