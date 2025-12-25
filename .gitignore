@@ -5,4 +5,4 @@ env/
 .terraform.lock.hcl
 *.tfplan
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
