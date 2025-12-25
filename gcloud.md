@@ -23,3 +23,10 @@ gcloud container images list
 gcloud auth configure-docker
 
 gcloud container images list
+
+cloud config set compute/region NAME
+gcloud config set account `ACCOUNT`
+gcloud config set compute/region europe-west4
+gcloud config set compute/zone europe-west4-b
+
+gcloud config get project
