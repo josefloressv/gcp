@@ -72,7 +72,13 @@ resource "google_compute_firewall" "allow_http_mig" {
 
 # 4. External Static IP for the Load Balancer (The Frontend IP)
 resource "google_compute_global_address" "lb_static_ip" {
-  name         = "lb-ipv4-1" #lb-static-ipv4
+  name         = "lb-static-ipv4" # Quicklabs instruction are incorrect here, they said lb-ipv4-1
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+}
+
+resource "google_compute_global_address" "lb_static_ip_2" {
+  name         = "lb-ipv4-1"
   address_type = "EXTERNAL"
   ip_version   = "IPV4"
 }
@@ -114,6 +120,13 @@ resource "google_compute_target_http_proxy" "http_proxy" {
 # 10. Global Forwarding Rule (The Frontend / Anycast IP)
 resource "google_compute_global_forwarding_rule" "http_forwarding_rule" {
   name       = "http-content-rule"
+  target     = google_compute_target_http_proxy.http_proxy.id
+  port_range = "80"
+  ip_address = google_compute_global_address.lb_static_ip_2.address
+}
+
+resource "google_compute_global_forwarding_rule" "http_forwarding_rule_justin_case" {
+  name       = "http-content-rule-justin-case"
   target     = google_compute_target_http_proxy.http_proxy.id
   port_range = "80"
   ip_address = google_compute_global_address.lb_static_ip.address
