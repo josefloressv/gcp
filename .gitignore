@@ -7,3 +7,4 @@ env/
 *.tfstate
 *.tfstate.*
 .infracost
+.DS_Store
