@@ -30,3 +30,4 @@ gcloud config set compute/region europe-west4
 gcloud config set compute/zone europe-west4-b
 
 gcloud config get project
+```
