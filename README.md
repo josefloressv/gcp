@@ -22,6 +22,15 @@ Some client libraries expect Application Default Credentials, not just gcloud au
 export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.gcp/sa-key.json"
 ```
 
+For Terraform
+```bash
+export GOOGLE_PROJECT=$(gcloud config get project)
+```
+then
+```hcl
+provider "google" {}
+```
+
 What you can do with a Service Account key
 
 Typical uses:
