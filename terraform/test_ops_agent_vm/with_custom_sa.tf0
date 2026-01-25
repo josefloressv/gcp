@@ -1,0 +1,71 @@
+# In a Pluralsight sandbox environment IAM permissions are limited. You can't grant project-level IAM roles. 
+
+# Fetch the current project from provider configuration
+data "google_project" "project" {}
+
+#region Service Account for VM with logging and monitoring permissions
+resource "google_service_account" "ops_agent_sa" {
+  account_id   = "ops-agent-sa"
+  display_name = "Ops Agent Service Account"
+  description  = "Service account for VM with Ops Agent to send logs and metrics to Cloud Observability"
+}
+
+# Grant Logging Admin role to the service account
+resource "google_project_iam_member" "logging_admin" {
+  project = data.google_project.project.project_id
+  role    = "roles/logging.admin"
+  member  = "serviceAccount:${google_service_account.ops_agent_sa.email}"
+}
+
+# Grant Monitoring Metric Writer role to the service account
+resource "google_project_iam_member" "monitoring_metric_writer" {
+  project = data.google_project.project.project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.ops_agent_sa.email}"
+}
+#endregion
+
+#region Instance
+resource "google_compute_instance" "vm_1" {
+  name         = "vm-ops-agent-1"
+  machine_type = "e2-medium"
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      # Empty block assigns an ephemeral external IP (Required for internet access to fetch updates)
+    }
+  }
+
+  # Attach the service account to the VM
+  service_account {
+    email  = google_service_account.ops_agent_sa.email
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+  }
+
+  # Startup script to install Ops Agent
+  metadata_startup_script = <<-EOT
+    #!/bin/bash
+    # Install Ops Agent
+    curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+    sudo bash add-google-cloud-ops-agent-repo.sh --also-install
+    
+    # Start the agent
+    sudo systemctl start google-cloud-ops-agent
+    sudo systemctl enable google-cloud-ops-agent
+  EOT
+
+  # Add dependency to ensure service account and IAM bindings are created first
+  depends_on = [
+    google_project_iam_member.logging_admin,
+    google_project_iam_member.monitoring_metric_writer
+  ]
+}
+#endregion

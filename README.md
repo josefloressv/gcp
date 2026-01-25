@@ -41,3 +41,7 @@ Typical uses:
 What it doesn’t magically do:
 	•	It won’t grant access beyond the service account’s IAM roles.
 	•	It’s not ideal for day-to-day human use (keys are risky vs user auth or impersonation).
+
+
+## Notes
+* In a Pluralsight sandbox environment IAM permissions are limited. You can't grant project-level IAM roles. 
